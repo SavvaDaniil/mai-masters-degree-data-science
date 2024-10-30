@@ -7,7 +7,8 @@ import pandas
 from pandas import DataFrame
 import matplotlib.pyplot as pyplot
 from statistics import median, mode
-from math import sqrt
+from math import sqrt, pi, e
+from typing import List
 
 
 calculated_column_name: str = "массой тела 500 - 999 г."
@@ -15,10 +16,11 @@ calculated_column_name: str = "массой тела 500 - 999 г."
 header_column_name: str = "Года"
 
 
+def gausa(x: int, average: float, standard_deviation: float) -> float:
+    return round(number=(1 / (standard_deviation * sqrt(2 * pi))) * e ** ((-1/2) * ((x - average) / (standard_deviation)) ** 2), ndigits=10)
+
 if __name__ == "__main__":
 
-    figure, ax = pyplot.subplots(nrows=3, ncols=1)#(ax_plot, ax_hist, ax_pie)
-    figure.suptitle("Лабораторная работа №2. Савва Даниил", fontsize=14)
 
     dataFrame: DataFrame = pandas.read_excel(io="stat_weights_of_newborns.xlsx", index_col=0, header=0)
 
@@ -43,9 +45,13 @@ if __name__ == "__main__":
 
     math_waiting: float = 0.0
     dispersion: float = 0.0
+    listX: List[int] = []
+    empirical_moment_4_prepare: float = 0.0
     for index, value in dataFrame.iterrows():
         math_waiting += value.values[0]
         dispersion += value.values[0] ** 2
+        listX.append(value.values[0])
+        empirical_moment_4_prepare += (value.values[0] - average) ** 4
     math_waiting = round(number=math_waiting / len(dataFrame.index), ndigits=2)
     print("Математическое ожидание: " + str(math_waiting))
 
@@ -58,9 +64,23 @@ if __name__ == "__main__":
     asymmetry: float = round(number=(average - moda) / standard_deviation, ndigits=2)
     print("Наблюдается " + ("левосторонняя" if average < moda else "правосторонняя") + " ассиметрия со значением: " + str(asymmetry))
 
-    print()
+    empirical_moment_4: float = empirical_moment_4_prepare / len(dataFrame.index)
+    print("Центральный эмпирический момент четвёртого порядка: ", round(number=empirical_moment_4, ndigits=2))
+
+    excess: float = round(number=empirical_moment_4 / standard_deviation ** 4 - 3, ndigits=2)
+    print("Коэффициент эксцесса:", excess)
 
 
+    listX.sort()
+    listY: List[float] = [gausa(x=x, average=average, standard_deviation=standard_deviation) for x in listX]
+    #print(listX)
+    #print(listY)
+    #dataFrameGausa = pandas.DataFrame(data={"y" : listY, "x" : listX})
+
+
+    """
+    figure, ax = pyplot.subplots(nrows=3, ncols=1)#(ax_plot, ax_hist, ax_pie)
+    figure.suptitle("Лабораторная работа №2. Савва Даниил", fontsize=14)
     
     dataFrame[calculated_column_name].plot(ax=ax[0])
     ax[0].set_title(label="Нормальное распределение состояния здоровья новорожденных", fontsize=8)
@@ -80,6 +100,10 @@ if __name__ == "__main__":
             'fontsize':6
         }
     )
+    """
+
+    pyplot.plot(listX, listY)
+    pyplot.hist(x=listX, density=True)
 
     print("\n---\n")
 
@@ -87,7 +111,6 @@ if __name__ == "__main__":
     
 
     pyplot.show()
-
 
 
 
