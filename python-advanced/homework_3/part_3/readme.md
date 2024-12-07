@@ -8,9 +8,9 @@
 
 Убедитесь, что ваш скрипт работает корректно в виртуальном окружении и не влияет на глобальные установки Python. В качестве url можно взять https://
 
-###
+***
 
-python -m venv vendor/venv0
-vendor/venv0/Scripts/activate
-pip install requirements.txt
-python main.py
+python -m venv vendor/venv0  
+vendor/venv0/Scripts/activate  
+pip install requirements.txt  
+python main.py  
